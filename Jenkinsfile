@@ -38,7 +38,7 @@ pipeline {
         stage('Sonar Analysis') {
             steps {
                 withSonarQubeEnv("Test_Sonar") {
-                    sh "mvn sonar:sonar"
+                    sh "mvn sonar:sonar -Dsonar.projectKey=devops-nagp -Dsonar.projectName=devops-nagp -X -e"
                 }
             }
         }
