@@ -38,10 +38,11 @@ pipeline {
         stage('Sonar Analysis') {
             steps {
                 withSonarQubeEnv("Test_Sonar") {
-                    sh "mvn sonar:sonar -Dsonar.projectKey=devops-nagp -Dsonar.projectName=devops-nagp -X -e"
+                    sh "mvn sonar:sonar"
                 }
             }
         }
+
         stage('Upload to Artifactory') {
             steps {
                 rtMavenDeployer(
@@ -61,44 +62,42 @@ pipeline {
             }
         }
 
-        // stage('Docker Image') {
-        //     steps {
-        //         sh returnStdout: true, script: 'docker build -t dtr.nagarro.com:443/devopssampleapplication_arpit_u_home:%BUILD_NUMBER% -f Dockerfile .'
-        //     }
-        // }
+        stage('Docker Image') {
+            steps {
+                sh returnStdout: true, script: 'docker build -t dtr.nagarro.com:443/i-mohitsharma04-develop:%BUILD_NUMBER% -f Dockerfile .'
+            }
+        }
 
-    //     stage('Containers') {
-    //         steps {
-    //             parallel(
-    //                 PrecontainerCheck: {
-    //                     script {
-    //                         try {
-    //                             sh "docker stop devopssampleapplication_arpit_u"
-    //                             sh "docker rm devopssampleapplication_arpit_u"
-    //                         } catch (err) {
-    //                             echo "No running container"
-    //                         }
-    //                     }
-    //                 },
-    //                 PushtoDTR: {
-    //                     sh returnStdout: true, script: 'docker push dtr.nagarro.com:443/devopssampleapplication_arpit_u_home:%BUILD_NUMBER%'
-    //                 }
-    //             )
-    //         }
-    //     }
+        stage('Containers') {
+            steps {
+                parallel(
+                    PrecontainerCheck: {
+                        script {
+                            try {
+                                sh "docker stop c-mohitsharma04-develop"
+                                sh "docker rm c-mohitsharma04-develop"
+                            } catch (err) {
+                                echo "No running container"
+                            }
+                        }
+                    },
+                    PushtoDTR: {
+                        sh returnStdout: true, script: 'docker push dtr.nagarro.com:443/i-mohitsharma04-develop:%BUILD_NUMBER%'
+                    }
+                )
+            }
+        }
 
-    //     stage('Docker deployment') {
-    //         steps {
-    //             sh 'docker run --name devopssampleapplication_arpit_u -d -p 7001:8080 dtr.nagarro.com:443/devopssampleapplication_arpit_u_home:%BUILD_NUMBER%'
-    //         }
-    //     }
+        stage('Docker deployment') {
+            steps {
+                sh 'docker run --name c-mohitsharma04-develop -d -p 6100:8080 dtr.nagarro.com:443/i-mohitsharma04-develop:%BUILD_NUMBER%'
+            }
+        }
 
-    // }
-
-        // post {
-        //     always {
-        //         echo "Build pipeline completed"
-        //     }
-        // }
+        post {
+            always {
+                echo "Build pipeline completed"
+            }
+        }
     }
 }
