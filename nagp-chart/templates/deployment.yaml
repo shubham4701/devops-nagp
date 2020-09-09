@@ -5,9 +5,7 @@ metadata:
   labels:
     app: {{ .Values.container }}
 spec:
-{{- if not .Values.autoscale }}
   replicas: {{ .Values.replicaCount }}
-{{- end }}
   selector:
     matchLabels:
       app: {{ .Values.container }}
